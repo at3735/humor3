@@ -59,7 +59,14 @@ export default async function EditHumorFlavorPage({ params }: { params: Promise<
   const deleteStep = async (stepId: number) => {
     'use server'
     const supabase = await createClient()
-    await supabase.from('humor_flavor_steps').delete().eq('id', stepId)
+    const { error } = await supabase
+      .from('humor_flavor_steps')
+      .delete()
+      .eq('id', stepId)
+    if (error) {
+      console.error('Error deleting step:', error)
+      throw new Error(error.message)
+    }
     revalidatePath(`/admin-board/edit/${id}`) // Revalidate the current page
   }
 

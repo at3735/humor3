@@ -2,9 +2,15 @@
 
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { Step } from './types' // We will create this types file next
+import { Step } from './types'
 
-export function DraggableStepItem({ step, children }: { step: Step, children: React.ReactNode }) {
+export function DraggableStepItem({
+  step,
+  children,
+}: {
+  step: Step;
+  children: (dragHandleProps: React.HTMLAttributes<HTMLElement>) => React.ReactNode;
+}) {
   const {
     attributes,
     listeners,
@@ -20,8 +26,8 @@ export function DraggableStepItem({ step, children }: { step: Step, children: Re
   }
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      {children}
+    <div ref={setNodeRef} style={style}>
+      {children({ ...attributes, ...listeners })}
     </div>
   )
 }

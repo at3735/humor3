@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import {
   DndContext,
   closestCenter,
@@ -31,6 +32,7 @@ interface SortableStepListProps {
 export default function SortableStepList({ flavorId, initialSteps, deleteStepAction, reorderStepsAction }: SortableStepListProps) {
   const [steps, setSteps] = useState(initialSteps)
   const [selectedStep, setSelectedStep] = useState<Step | null>(null)
+  const router = useRouter()
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -51,7 +53,17 @@ export default function SortableStepList({ flavorId, initialSteps, deleteStepAct
 
   const handleStepDelete = async (stepId: number) => {
     if (window.confirm('Are you sure you want to delete this step?')) {
-      await deleteStepAction(stepId)
+      try {
+        await deleteStepAction(stepId)
+        setSteps((prev) => prev.filter((step) => step.id !== stepId))
+        if (selectedStep?.id === stepId) {
+          setSelectedStep(null)
+        }
+        router.refresh()
+      } catch (err) {
+        console.error(err)
+        alert('Failed to delete step')
+      }
     }
   }
 
@@ -63,21 +75,23 @@ export default function SortableStepList({ flavorId, initialSteps, deleteStepAct
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {steps.map((step, index) => ( // Get the index from the map function
               <DraggableStepItem key={step.id} step={step}>
-                <div style={{ border: '1px solid #eee', borderRadius: '6px', padding: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'white' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                    <span style={{ cursor: 'grab', color: '#999' }}>&#x2630;</span>
-                    <div>
-                      {/* Use the array index for the label */}
-                      <span style={{ fontWeight: 'bold', marginRight: '10px' }}>Step {index + 1}</span>
-                      <span>{step.description || 'No description'}</span>
+                {(dragHandleProps) => (
+                  <div style={{ border: '1px solid #eee', borderRadius: '6px', padding: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'white' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                      <span {...dragHandleProps} style={{ cursor: 'grab', color: '#999' }}>&#x2630;</span>
+                      <div>
+                        {/* Use the array index for the label */}
+                        <span style={{ fontWeight: 'bold', marginRight: '10px' }}>Step {index + 1}</span>
+                        <span>{step.description || 'No description'}</span>
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                      <button onClick={() => setSelectedStep(step)} style={{ padding: '8px 12px', borderRadius: '5px', border: '1px solid #ccc', backgroundColor: 'white', cursor: 'pointer' }}>View</button>
+                      <Link href={`/admin-board/edit/${flavorId}/step/${step.id}`} style={{ padding: '8px 12px', borderRadius: '5px', border: '1px solid #ccc', backgroundColor: '#ffc107', color: 'black', textDecoration: 'none' }}>Edit</Link>
+                      <button onClick={() => handleStepDelete(step.id)} style={{ padding: '8px 12px', borderRadius: '5px', backgroundColor: '#dc3545', color: 'white', cursor: 'pointer', border: 'none' }}>Delete</button>
                     </div>
                   </div>
-                  <div style={{ display: 'flex', gap: '10px' }}>
-                    <button onClick={() => setSelectedStep(step)} style={{ padding: '8px 12px', borderRadius: '5px', border: '1px solid #ccc', backgroundColor: 'white', cursor: 'pointer' }}>View</button>
-                    <Link href={`/admin-board/edit/${flavorId}/step/${step.id}`} style={{ padding: '8px 12px', borderRadius: '5px', border: '1px solid #ccc', backgroundColor: '#ffc107', color: 'black', textDecoration: 'none' }}>Edit</Link>
-                    <button onClick={() => handleStepDelete(step.id)} style={{ padding: '8px 12px', borderRadius: '5px', backgroundColor: '#dc3545', color: 'white', cursor: 'pointer', border: 'none' }}>Delete</button>
-                  </div>
-                </div>
+                )}
               </DraggableStepItem>
             ))}
             {steps.length === 0 && <p>No steps found for this flavor.</p>}
