@@ -1,4 +1,4 @@
-'use client';
+'use client'
 
 import { useState } from 'react'
 import Link from 'next/link'
@@ -39,6 +39,7 @@ export default function TestFlavorPage() {
 
     const formData = new FormData()
     formData.append('image', imageFile)
+    console.log('Submitting with image:', imageFile.name, imageFile.size)
 
     try {
       if (!id) throw new Error('Missing flavor id.')
