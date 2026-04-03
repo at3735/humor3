@@ -96,7 +96,7 @@ export async function registerImageUrl(cdnUrl: string) {
   return result
 }
 
-export async function generateCaptionsForImage(imageId: string | number, flavorId?: string) {
+export async function generateCaptionsForImage(imageId: string | number, flavorId?: string | number) {
   const token = await getSupabaseAccessToken()
   if (!token) throw new Error('Authentication token not found.')
 
@@ -131,4 +131,71 @@ export async function generateCaptionsForImage(imageId: string | number, flavorI
   const result = await readJsonOrText(response)
   console.log('[test] generateCaptionsForImage response', { ms: Date.now() - startedAt, result })
   return result
+}
+
+export async function saveImageReference(cdnUrl: string) {
+  const cookieStore = await cookies()
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return cookieStore.get(name)?.value
+        },
+      },
+    }
+  )
+
+  const { data, error } = await supabase
+    .from('images')
+    .insert([{ url: cdnUrl, is_public: false }])
+    .select('id')
+    .single()
+
+  if (error) {
+    console.error('Failed to save image reference:', error)
+    throw new Error(`Failed to save image reference: ${error.message}`)
+  }
+
+  console.log('[test] saved image reference', data)
+  return data.id
+}
+
+export async function saveCaptions(captions: any[], imageId: string, humorFlavorId: number) {
+  const cookieStore = await cookies()
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return cookieStore.get(name)?.value
+        },
+      },
+    }
+  )
+
+  const captionsToInsert = captions.map((caption: any) => ({
+    content: typeof caption === 'string' ? caption : (caption?.content ?? String(caption)),
+    is_public: false, // Assuming default to false
+    profile_id: caption.profile_id, // Use profile_id from the caption object
+    image_id: imageId,
+    humor_flavor_id: humorFlavorId, // Use the correct humorFlavorId
+    caption_request_id: caption.caption_request_id,
+    llm_prompt_chain_id: caption.llm_prompt_chain_id,
+  }));
+
+  const { data, error } = await supabase
+    .from('captions')
+    .insert(captionsToInsert)
+    .select('id')
+
+  if (error) {
+    console.error('Failed to save captions:', error)
+    throw new Error(`Failed to save captions: ${error.message}`)
+  }
+
+  console.log('[test] saved captions', data)
+  return data.map((c: any) => c.id)
 }

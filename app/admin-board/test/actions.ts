@@ -1,6 +1,11 @@
 'use server'
 
-import { generatePresignedUrl, registerImageUrl, generateCaptionsForImage } from './api'
+import {
+  generatePresignedUrl,
+  generateCaptionsForImage,
+  saveImageReference,
+  saveCaptions
+} from './api'
 
 export async function generateCaptions(
   flavorId: string,
@@ -26,17 +31,25 @@ export async function generateCaptions(
 
     if (!uploadRes.ok) throw new Error('Upload failed')
 
-    console.log('[test] registering image URL')
-    const registerRes = await registerImageUrl(cdnUrl)
-    const imageId = registerRes?.imageId || registerRes?.image_id || registerRes?.id
+    console.log('[test] saving image reference')
+    const imageId = await saveImageReference(cdnUrl)
     if (!imageId) {
-      console.error('Register image response:', registerRes)
-      throw new Error('Failed to register image.')
+      throw new Error('Failed to save image and get ID.')
     }
 
     console.log('[test] generating captions', { imageId })
-    const captionsRes = await generateCaptionsForImage(String(imageId), flavorId)
+    const numericFlavorId = parseInt(flavorId, 10);
+    if (isNaN(numericFlavorId)) {
+      throw new Error('Invalid flavorId provided. Must be a number.');
+    }
+    const captionsRes = await generateCaptionsForImage(String(imageId), numericFlavorId)
     console.log('[test] captions response', captionsRes)
+
+    if (Array.isArray(captionsRes) && captionsRes.length > 0) {
+      console.log('[test] saving captions')
+      await saveCaptions(captionsRes, imageId, numericFlavorId)
+    }
+
     console.log('[test] generateCaptions done', { ms: Date.now() - startedAt })
     if (Array.isArray(captionsRes)) {
       return captionsRes.map((caption: any) => (
