@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { createClient } from '@/utils/supabase/server'
 import ThemeToggle from './theme-toggle'
+import DuplicateButton from './duplicate-button'
 
 export default async function AdminBoardPage() {
   const supabase = await createClient()
@@ -47,6 +48,7 @@ export default async function AdminBoardPage() {
                 <Link href={`/admin-board/captions/${flavor.id}`} style={{ padding: '8px 12px', borderRadius: '5px', border: '1px solid var(--border)', backgroundColor: 'var(--surface)', textDecoration: 'none', color: 'var(--foreground)' }}>
                   Captions
                 </Link>
+                <DuplicateButton flavorId={flavor.id.toString()} />
               </div>
             </div>
           ))}
