@@ -76,17 +76,17 @@ export default function SortableStepList({ flavorId, initialSteps, deleteStepAct
             {steps.map((step, index) => ( // Get the index from the map function
               <DraggableStepItem key={step.id} step={step}>
                 {(dragHandleProps) => (
-                  <div style={{ border: '1px solid #eee', borderRadius: '6px', padding: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'white' }}>
+                  <div style={{ border: '1px solid var(--border)', borderRadius: '6px', padding: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'var(--surface)' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                      <span {...dragHandleProps} style={{ cursor: 'grab', color: '#999' }}>&#x2630;</span>
+                      <span {...dragHandleProps} style={{ cursor: 'grab', color: 'var(--muted)' }}>&#x2630;</span>
                       <div>
                         {/* Use the array index for the label */}
-                        <span style={{ fontWeight: 'bold', marginRight: '10px' }}>Step {index + 1}</span>
-                        <span>{step.description || 'No description'}</span>
+                        <span style={{ fontWeight: 'bold', marginRight: '10px', color: 'var(--foreground)' }}>Step {index + 1}</span>
+                        <span style={{ color: 'var(--muted)' }}>{step.description || 'No description'}</span>
                       </div>
                     </div>
                     <div style={{ display: 'flex', gap: '10px' }}>
-                      <button onClick={() => setSelectedStep(step)} style={{ padding: '8px 12px', borderRadius: '5px', border: '1px solid #ccc', backgroundColor: 'white', cursor: 'pointer' }}>View</button>
+                      <button onClick={() => setSelectedStep(step)} style={{ padding: '8px 12px', borderRadius: '5px', border: '1px solid var(--border)', backgroundColor: 'var(--surface)', color: 'var(--foreground)', cursor: 'pointer' }}>View</button>
                       <Link href={`/admin-board/edit/${flavorId}/step/${step.id}`} style={{ padding: '8px 12px', borderRadius: '5px', border: '1px solid #ccc', backgroundColor: '#ffc107', color: 'black', textDecoration: 'none' }}>Edit</Link>
                       <button onClick={() => handleStepDelete(step.id)} style={{ padding: '8px 12px', borderRadius: '5px', backgroundColor: '#dc3545', color: 'white', cursor: 'pointer', border: 'none' }}>Delete</button>
                     </div>

@@ -19,10 +19,10 @@ export default function LoginPage() {
     <div className={styles.container}>
       <div className={styles.box}>
         <h1 className={styles.title}>
-          Admin Portal
+          Prompt Chain App
         </h1>
         <p className={styles.subtitle}>
-          Please log in to see the admin dashboard.
+          Please log in to continue.
         </p>
         <button
           onClick={handleGoogleLogin}
