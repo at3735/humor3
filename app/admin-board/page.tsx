@@ -17,7 +17,7 @@ export default async function AdminBoardPage() {
   return (
     <div style={{ fontFamily: 'sans-serif', padding: '20px', maxWidth: '1000px', margin: 'auto' }}>
       <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px', gap: '16px', flexWrap: 'wrap' }}>
-        <h1 style={{ fontSize: '1.8rem', margin: 0 }}>Admin Board</h1>
+        <h1 style={{ fontSize: '1.8rem', margin: 0 }}>Humor Flavor List</h1>
         <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
           <ThemeToggle />
           <Link href="/admin-board/new" style={{ padding: '10px 16px', borderRadius: '5px', backgroundColor: 'var(--primary)', color: 'var(--primary-contrast)', textDecoration: 'none', fontSize: '0.95rem' }}>

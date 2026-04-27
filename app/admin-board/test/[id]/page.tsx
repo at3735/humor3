@@ -45,7 +45,7 @@ export default function TestFlavorPage() {
       if (!id) throw new Error('Missing flavor id.')
       const result = await generateCaptions(id, formData)
       setCaptions(result)
-      setStatus(null)
+      setStatus(result.length > 0 ? null : 'No captions were generated.')
     } catch (err) {
       console.error(err)
       const message = err instanceof Error ? err.message : 'Failed to generate captions'
@@ -59,7 +59,7 @@ export default function TestFlavorPage() {
     <div style={{ fontFamily: 'sans-serif', padding: '20px', maxWidth: '800px', margin: 'auto' }}>
       <header style={{ marginBottom: '30px' }}>
         <Link href="/admin-board" style={{ textDecoration: 'none', color: '#007bff' }}>
-          &larr; Back to Admin Board
+          &larr; Back to Flavor List
         </Link>
         <h1 style={{ fontSize: '1.8rem', marginTop: '10px' }}>Test Humor Flavor</h1>
       </header>
@@ -83,11 +83,15 @@ export default function TestFlavorPage() {
             {isLoading ? (
               <p>Loading captions...</p>
             ) : (
-              <ul>
-                {captions.map((caption, index) => (
-                  <li key={index} style={{ marginBottom: '10px', paddingBottom: '10px', borderBottom: '1px solid #f0f0f0' }}>{caption}</li>
-                ))}
-              </ul>
+              captions.length > 0 && (
+                <ul style={{ listStyle: 'none', padding: 0 }}>
+                  {captions.map((caption, index) => (
+                    <li key={index} style={{ marginBottom: '10px', paddingBottom: '10px', borderBottom: '1px solid #f0f0f0' }}>
+                      {caption}
+                    </li>
+                  ))}
+                </ul>
+              )
             )}
           </div>
         </section>

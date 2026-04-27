@@ -41,7 +41,7 @@ export default async function ViewCaptionsPage({ params }: { params: Promise<{ i
     <div style={{ fontFamily: 'sans-serif', padding: '20px', maxWidth: '1200px', margin: 'auto' }}>
       <header style={{ marginBottom: '30px' }}>
         <Link href="/admin-board" style={{ textDecoration: 'none', color: '#007bff' }}>
-          &larr; Back to Admin Board
+          &larr; Back to Flavor List
         </Link>
         <h1 style={{ fontSize: '1.8rem', marginTop: '10px' }}>Captions for: <span style={{ color: '#007bff' }}>{flavor.slug}</span></h1>
       </header>
