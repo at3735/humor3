@@ -66,8 +66,30 @@ export default function TestFlavorPage() {
 
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '40px' }}>
         <div>
-          <label htmlFor="image-upload" style={{ display: 'block', marginBottom: '10px', fontWeight: 'bold' }}>1. Upload an Image</label>
-          <input type="file" id="image-upload" name="image" accept="image/*" onChange={handleFileChange} required />
+          <label style={{ display: 'block', marginBottom: '10px', fontWeight: 'bold' }}>1. Upload an Image</label>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <label htmlFor="image-upload" style={{
+              display: 'inline-block',
+              padding: '10px 15px',
+              borderRadius: '5px',
+              border: '1px solid #ccc',
+              backgroundColor: 'white',
+              color: '#333',
+              cursor: 'pointer',
+            }}>
+              Choose File
+            </label>
+            <input
+              type="file"
+              id="image-upload"
+              name="image"
+              accept="image/*"
+              onChange={handleFileChange}
+              required
+              style={{ display: 'none' }} // Hide the default input
+            />
+            {imageFile && <span>{imageFile.name}</span>}
+          </div>
         </div>
         <button type="submit" disabled={isLoading || !imageFile} style={{ padding: '12px 20px', borderRadius: '5px', border: 'none', backgroundColor: '#007bff', color: 'white', cursor: 'pointer', fontSize: '1rem', opacity: (isLoading || !imageFile) ? 0.5 : 1 }}>
           {isLoading ? 'Generating...' : '2. Generate Captions'}

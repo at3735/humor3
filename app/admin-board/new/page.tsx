@@ -1,50 +1,45 @@
-// This is now a Server Component, no 'use client' needed.
+'use client'
 
-import { createClient } from '@/utils/supabase/server'
-import { redirect } from 'next/navigation'
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { createFlavor } from './actions'
 
 export default function NewHumorFlavorPage() {
+  const [error, setError] = useState<string | null>(null)
+  const router = useRouter()
 
-  const createFlavor = async (formData: FormData) => {
-    'use server'
-
-    const slug = formData.get('slug') as string
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    const formData = new FormData(event.currentTarget)
+    const name = formData.get('name') as string
     const description = formData.get('description') as string
 
-    if (!slug) {
-      // Handle error: slug is required
-      return
-    }
+    const result = await createFlavor(name, description)
 
-    const supabase = await createClient()
-
-    const { error } = await supabase
-      .from('humor_flavors')
-      .insert([{ slug, description }])
-
-    if (error) {
-      console.error('Error creating flavor:', error)
-      // Optionally, handle the error in the UI
-    } else {
-      redirect('/admin-board')
+    if (result?.error) {
+      setError(result.error)
+      alert(result.error) // Display the error in an alert
+    } else if (result?.success) {
+      setError(null)
+      router.push('/admin-board')
     }
   }
 
   return (
     <div style={{ fontFamily: 'sans-serif', padding: '20px', maxWidth: '600px', margin: 'auto' }}>
       <h1 style={{ fontSize: '1.8rem', marginBottom: '30px' }}>Create New Humor Flavor</h1>
-      <form action={createFlavor} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
         <div>
-          <label htmlFor="slug" style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Slug</label>
+          <label htmlFor="name" style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Name</label>
           <input
             type="text"
-            id="slug"
-            name="slug"
+            id="name"
+            name="name"
             required
             style={{ width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}
           />
-          <p style={{ fontSize: '0.8rem', color: '#666', marginTop: '5px' }}>A unique, URL-friendly identifier (e.g., "witty-puns").</p>
+          <p style={{ fontSize: '0.8rem', color: '#666', marginTop: '5px' }}>A unique name for the flavor (e.g., "Witty Puns").</p>
         </div>
         <div>
           <label htmlFor="description" style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Description</label>
@@ -55,6 +50,7 @@ export default function NewHumorFlavorPage() {
             style={{ width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}
           />
         </div>
+        {error && <p style={{ color: 'red' }}>{error}</p>}
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
           <Link href="/admin-board" style={{
             padding: '10px 20px',
